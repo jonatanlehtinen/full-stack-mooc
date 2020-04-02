@@ -4,6 +4,9 @@ import { getPersons, postNewPerson, deletePerson, updatePerson } from "./api"
 import Filter from './Filter';
 import PersonForm from './PersonForm';
 import Persons from './Persons';
+import Notification from './Notification';
+
+import ACTION_TYPES from "./actionTypes"
 
 
 const App = () => {
@@ -11,6 +14,7 @@ const App = () => {
   const [ newName, setNewName ] = useState('')
   const [ newNumber, setNewNumber ] = useState('')
   const [filter, setFilter] = useState('')
+  const [notification, setNotification] = useState(null)
 
   useEffect(() => {
     getPersons().then(data => {
@@ -30,13 +34,24 @@ const App = () => {
     } else {
       const newPerson = {name: newName, number: newNumber}
       setPersons(persons.concat(newPerson))
-      postNewPerson(newPerson)
-      setNewName("")
+      postNewPerson(newPerson).then(() => {
+        setNewName("")
+        showNotification({
+          action: ACTION_TYPES.ADD,
+          personName: newPerson.name,
+          successful: true
+        })
+      }).catch(err => {
+        showNotification({
+          action: ACTION_TYPES.ADD,
+          personName: newPerson.name,
+          successful: false
+        })
+      })
     }
   }
 
   const updateNumber = oldPerson => {
-    console.log(oldPerson)
     const updatedPerson = {...oldPerson, number: newNumber}
     updatePerson(updatedPerson).then(data => {
       setPersons(persons.map(person => {
@@ -46,7 +61,23 @@ const App = () => {
           return data
         }
       }))
+      showNotification({
+        action: ACTION_TYPES.UPDATE,
+        personName: updatedPerson.name,
+        successful: true
+      })
+    }).catch(err => {
+      showNotification({
+        action: ACTION_TYPES.UPDATE,
+        personName: updatedPerson.name,
+        successful: false
+      })
     })
+  }
+
+  const showNotification = notification => {
+    setNotification(notification)
+    setTimeout(() => setNotification(null), 5000)
   }
 
   const handleDeletingPerson = personToDelete => {
@@ -54,7 +85,19 @@ const App = () => {
     if(confirmed) {
       const filtered = persons.filter(person => person.id !== personToDelete.id)
       setPersons(filtered)
-      deletePerson(personToDelete.id)
+      deletePerson(personToDelete.id).then(() => {
+        showNotification({
+          action: ACTION_TYPES.DELETE,
+          personName: personToDelete.name,
+          successful: true
+        })
+    }).catch(err => {
+      showNotification({
+        action: ACTION_TYPES.DELETE,
+        personName: personToDelete.name,
+        successful: false
+      })
+    })
     }
   }
 
@@ -65,6 +108,7 @@ const App = () => {
   return (
     <div>
       <h2>Phonebook</h2>
+      <Notification notification={notification}/>
       <Filter setFilter={setFilter}/>
       <h2>Add a new</h2>
       <PersonForm setName={setNewName} setNumber={setNewNumber} submit={addToPersons}/>

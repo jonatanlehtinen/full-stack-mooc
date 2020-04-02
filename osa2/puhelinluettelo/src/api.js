@@ -6,11 +6,13 @@ const getPersons = () => {
 }
 
 const postNewPerson = person => {
-  Axios.post('http://localhost:3001/persons', person)
+  const request = Axios.post('http://localhost:3001/persons', person)
+  return request.then(response => response.data)
 }
 
 const deletePerson = id => {
-  Axios.delete(`http://localhost:3001/persons/${id}`,)
+  const request = Axios.delete(`http://localhost:3001/persons/${id}`,)
+  return request.then(response => response.data)
 }
 
 const updatePerson = person => {
