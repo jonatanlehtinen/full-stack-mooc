@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import Axios from "axios"
+import { getPersons, postNewPerson, deletePerson, updatePerson } from "./api"
 
 import Filter from './Filter';
 import PersonForm from './PersonForm';
@@ -13,8 +13,8 @@ const App = () => {
   const [filter, setFilter] = useState('')
 
   useEffect(() => {
-    Axios.get('http://localhost:3001/persons').then(response => {
-      setPersons(response.data)
+    getPersons().then(data => {
+      setPersons(data)
     })
   }, [])
 
@@ -22,10 +22,39 @@ const App = () => {
     event.preventDefault()
     const filteredPersons = persons.filter(person => person.name === newName)
     if(filteredPersons.length > 0) {
-      alert(`${newName} is already added to phonebook`)
+      const oldPerson = filteredPersons[0]
+      const confirmed = window.confirm(`${oldPerson.name} is already added to phonebook, replace the old number with a new one?`)
+      if(confirmed) {
+        updateNumber(oldPerson)
+      }
     } else {
-      setPersons(persons.concat({name: newName, number: newNumber}))
+      const newPerson = {name: newName, number: newNumber}
+      setPersons(persons.concat(newPerson))
+      postNewPerson(newPerson)
       setNewName("")
+    }
+  }
+
+  const updateNumber = oldPerson => {
+    console.log(oldPerson)
+    const updatedPerson = {...oldPerson, number: newNumber}
+    updatePerson(updatedPerson).then(data => {
+      setPersons(persons.map(person => {
+        if(data.id !== person.id) {
+          return person
+        } else {
+          return data
+        }
+      }))
+    })
+  }
+
+  const handleDeletingPerson = personToDelete => {
+    const confirmed = window.confirm(`Delete ${personToDelete.name}?`)
+    if(confirmed) {
+      const filtered = persons.filter(person => person.id !== personToDelete.id)
+      setPersons(filtered)
+      deletePerson(personToDelete.id)
     }
   }
 
@@ -40,7 +69,7 @@ const App = () => {
       <h2>Add a new</h2>
       <PersonForm setName={setNewName} setNumber={setNewNumber} submit={addToPersons}/>
       <h2>Numbers</h2>
-      <Persons persons={filterPersonsToShow()}/>
+      <Persons persons={filterPersonsToShow()} handleDelete={handleDeletingPerson}/>
     </div>
   )
 
