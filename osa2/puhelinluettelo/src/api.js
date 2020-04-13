@@ -1,22 +1,24 @@
 import Axios from "axios"
 
+const baseURL = "/api/persons"
+
 const getPersons = () => {
-  const request = Axios.get('http://localhost:3001/persons')
+  const request = Axios.get(baseURL)
   return request.then(response =>  response.data )
 }
 
 const postNewPerson = person => {
-  const request = Axios.post('http://localhost:3001/persons', person)
+  const request = Axios.post(baseURL, person)
   return request.then(response => response.data)
 }
 
 const deletePerson = id => {
-  const request = Axios.delete(`http://localhost:3001/persons/${id}`,)
+  const request = Axios.delete(baseURL + "/" + id,)
   return request.then(response => response.data)
 }
 
 const updatePerson = person => {
-  const request = Axios.put(`http://localhost:3001/persons/${person.id}`, person)
+  const request = Axios.put(baseURL + "/" + person.id, person)
   return request.then(response => response.data)
 }
 
