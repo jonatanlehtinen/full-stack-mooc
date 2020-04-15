@@ -7,3 +7,14 @@ Content-Type: application/json
   "url": "www.est.com",
   "likes": 2
 }
+
+GET http://localhost:3003/api/blogs
+
+DELETE http://localhost:3003/api/blogs/5e9743f2806eaa4f55baf98a
+
+PUT http://localhost:3003/api/blogs/5e974bac9ecc864ff946fbe3
+Content-Type: application/json
+
+{
+  "likes": 10
+}
