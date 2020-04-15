@@ -33,8 +33,8 @@ const App = () => {
       }
     } else {
       const newPerson = {name: newName, number: newNumber}
-      setPersons(persons.concat(newPerson))
       postNewPerson(newPerson).then(() => {
+        setPersons(persons.concat(newPerson))
         setNewName("")
         showNotification({
           action: ACTION_TYPES.ADD,
@@ -44,7 +44,7 @@ const App = () => {
       }).catch(err => {
         showNotification({
           action: ACTION_TYPES.ADD,
-          personName: newPerson.name,
+          message: err.response.data.error,
           successful: false
         })
       })

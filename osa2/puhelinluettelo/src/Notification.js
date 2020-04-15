@@ -14,7 +14,7 @@ const Notification = ({ notification }) => {
   let message = ''
   switch (notification.action) {
     case TYPES.ADD:
-      message =  success ? `Added ${notification.personName}` : `Failed to add ${notification.personName}`
+      message =  success ? `Added ${notification.personName}` : notification.message
       break
     case TYPES.DELETE:
       message = success ? `Deleted ${notification.personName}` : `Failed to delete ${notification.personName}`
