@@ -7,9 +7,11 @@ const app = require('../app')
 const api = supertest(app)
 
 const Blog = require('../models/blog')
+const User = require('../models/user')
 
 beforeEach(async () => {
   await Blog.deleteMany({})
+  await User.deleteMany({})
 
   let blogObject = new Blog(helper.initialBlogs[0])
   await blogObject.save()
@@ -53,6 +55,9 @@ test('all blogs have an identifying field id', async () => {
 })
 
 test('a valid blog can be added ', async () => {
+
+  const token = await helper.getTokenForTestUser(api)
+
   const newBlog = {
     title: 'This is a title',
     author: 'J.K. Rowling',
@@ -62,6 +67,7 @@ test('a valid blog can be added ', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', token)
     .send(newBlog)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -75,6 +81,9 @@ test('a valid blog can be added ', async () => {
 })
 
 test('likes is set to 0 if no likes are given', async () => {
+
+  const token = await helper.getTokenForTestUser(api)
+
   const blogWithNoLikes = {
     title: 'This is a title',
     author: 'J.K. Rowling',
@@ -83,6 +92,7 @@ test('likes is set to 0 if no likes are given', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', token)
     .send(blogWithNoLikes)
     .expect(201)
     .expect('Content-Type', /application\/json/)
@@ -95,6 +105,9 @@ test('likes is set to 0 if no likes are given', async () => {
 
 
 test('post returns 400 if no title and url is given', async () => {
+  
+  const token = await helper.getTokenForTestUser(api)
+
   const blogWithNoTitleAndLikes = {
     author: 'J.K. Rowling',
     likes: 10
@@ -102,10 +115,28 @@ test('post returns 400 if no title and url is given', async () => {
 
   await api
     .post('/api/blogs')
+    .set('Authorization', token)
     .send(blogWithNoTitleAndLikes)
     .expect(400)
 })
 
+test('post returns 401 if no token is given', async () => {
+  
+  const newBlog = {
+    title: 'This is a title',
+    author: 'J.K. Rowling',
+    url: 'http://www.u.arizona.edu/~rubinson/copyright_violations/Go_To_Considered_Harmful.html',
+    likes: 1,
+  }
+
+  await api
+    .post('/api/blogs')
+    .send(newBlog)
+    .expect(401)
+    .expect(response => {
+      expect(response.body.error).toEqual("invalid token")
+    })
+})
 
 afterAll(() => {
   mongoose.connection.close()

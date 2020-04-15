@@ -21,6 +21,31 @@ const initialBlogs = [
   }
 ]
 
+const getTokenForTestUser = async (api) => {
+  const testUser = {
+    username: "test",
+    password: "test",
+    name: "Test",
+  }
+
+  await api
+  .post('/api/users')
+  .send(testUser)
+
+  let token = ""
+
+  await api
+    .post('/api/login')
+    .send({username: "test", password: "test"})
+    .expect(response => {
+      console.log(response.body)
+      token =  "Bearer " + response.body.token
+    })
+    
+  return token
+}
+
 module.exports = {
-  initialBlogs
+  initialBlogs,
+  getTokenForTestUser
 }

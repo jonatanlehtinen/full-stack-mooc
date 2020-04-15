@@ -1,20 +1,50 @@
 POST http://localhost:3003/api/blogs
 Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6Im1vaWtrc2RzZGZzZGZmYSIsImlkIjoiNWU5NzY1NTY0YTU1OTQ1YmNjNWViNTYyIiwiaWF0IjoxNTg2OTgyNDAxfQ.cc3ioaIxKGOMABEILXdbwSGwDgo4Ila7G-YIZ9UD6nA
 
 {
-  "title": "Tesasdfastit",
+  "title": "tokenidfsdfsnasdf",
   "author": "Moikka",
   "url": "www.est.com",
   "likes": 2
 }
 
-GET http://localhost:3003/api/blogs
+GET http://localhost:3003/api/users
 
-DELETE http://localhost:3003/api/blogs/5e9743f2806eaa4f55baf98a
+DELETE http://localhost:3003/api/blogs/5e976f66b54fe6617d894332
+Content-Type: application/json
+Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6InRlc3QiLCJpZCI6IjVlOTc3NjQxYjZhYmNmNjRkNDY0Mjc5MSIsImlhdCI6MTU4Njk4NDUzMn0.qDCGLAzN7iK7lku4xDozNNbjdaGIAlB_iobaeGLaigY
+
 
 PUT http://localhost:3003/api/blogs/5e974bac9ecc864ff946fbe3
 Content-Type: application/json
 
 {
   "likes": 10
+}
+
+
+POST http://localhost:3003/api/users
+Content-Type: application/json
+
+{
+  "username": "test",
+  "name": "testddfi",
+  "password": "test"
+}
+
+POST http://localhost:3003/api/login
+Content-Type: application/json
+
+{
+  "username": "moikksdsdfsdffa",
+  "password": "sdkfjlksjdkf"
+}
+
+POST http://localhost:3003/api/login
+Content-Type: application/json
+
+{
+  "username": "test",
+  "password": "test"
 }
