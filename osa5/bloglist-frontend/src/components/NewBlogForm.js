@@ -1,13 +1,11 @@
 import React, { useState } from 'react'
 
+const NewBlogForm = ({ createBlog }) => {
+  const [title, setTitle] = useState('')
+  const [author, setAuthor] = useState('')
+  const [url, setURL] = useState('')
 
-const NewBlogForm = ({createBlog}) => {
-  const [title, setTitle] = useState('') 
-  const [author, setAuthor] = useState('') 
-  const [url, setURL] = useState('') 
-
-
-  const handleSubmit = event => {
+  const handleSubmit = (event) => {
     event.preventDefault()
     const newBlog = { title, author, url }
     createBlog(newBlog)
@@ -15,16 +13,16 @@ const NewBlogForm = ({createBlog}) => {
     setTitle('')
     setAuthor('')
     setURL('')
- }
+  }
 
   return (
     <div>
       <h2>create new</h2>
-            
+
       <form onSubmit={handleSubmit}>
         <div>
           title:
-            <input
+          <input
             type="text"
             value={title}
             name="Title"
@@ -33,7 +31,7 @@ const NewBlogForm = ({createBlog}) => {
         </div>
         <div>
           author:
-            <input
+          <input
             type="text"
             value={author}
             name="Author"
@@ -42,7 +40,7 @@ const NewBlogForm = ({createBlog}) => {
         </div>
         <div>
           url:
-            <input
+          <input
             type="text"
             value={url}
             name="URL"
@@ -54,6 +52,5 @@ const NewBlogForm = ({createBlog}) => {
     </div>
   )
 }
-
 
 export default NewBlogForm

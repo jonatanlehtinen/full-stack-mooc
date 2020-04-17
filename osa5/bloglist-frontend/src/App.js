@@ -8,17 +8,16 @@ import NewBlogForm from './components/NewBlogForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
-  const [username, setUsername] = useState('') 
-  const [password, setPassword] = useState('') 
+  const [username, setUsername] = useState('')
+  const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState(null)
   const [showCreateBlog, setShowCreateBlog] = useState(false)
 
-
   useEffect(() => {
-    blogService.getAll().then(blogs => {
-      blogs.sort((a, b) => (a.likes < b.likes) ? 1 : -1)
-      setBlogs( blogs )
+    blogService.getAll().then((blogs) => {
+      blogs.sort((a, b) => (a.likes < b.likes ? 1 : -1))
+      setBlogs(blogs)
     })
   }, [])
 
@@ -32,7 +31,7 @@ const App = () => {
   }, [])
 
   const showNotification = (message, successful) => {
-    const newNotification = {message, successful}
+    const newNotification = { message, successful }
     setNotification(newNotification)
     setTimeout(() => {
       setNotification(null)
@@ -43,19 +42,18 @@ const App = () => {
     event.preventDefault()
     try {
       const user = await loginService.login({
-        username, password,
+        username,
+        password,
       })
 
-      window.localStorage.setItem(
-        'loggedBlogUser', JSON.stringify(user)
-      ) 
+      window.localStorage.setItem('loggedBlogUser', JSON.stringify(user))
 
       setUser(user)
       setUsername('')
       setPassword('')
       showNotification(`${user.name} logged in successfully`, true)
     } catch (exception) {
-      showNotification("Wrong username or password", false)
+      showNotification('Wrong username or password', false)
     }
   }
 
@@ -67,52 +65,57 @@ const App = () => {
   const handleLike = async (id, likes) => {
     try {
       await blogService.like(id, { likes })
-      const updatedBlogs = blogs.map(blog => blog.id === id ? {...blog, likes} : blog)
-      updatedBlogs.sort((a, b) => (a.likes < b.likes) ? 1 : -1)
+      const updatedBlogs = blogs.map((blog) =>
+        blog.id === id ? { ...blog, likes } : blog
+      )
+      updatedBlogs.sort((a, b) => (a.likes < b.likes ? 1 : -1))
       console.log(updatedBlogs)
       setBlogs(updatedBlogs)
       showNotification('Like added succesfully', true)
-    } catch(exception) {
+    } catch (exception) {
       console.log(exception)
       showNotification('Failed to add like', false)
     }
   }
 
-  const handleCreateBlog = async newBlog => {
+  const handleCreateBlog = async (newBlog) => {
     try {
       const response = await blogService.create(newBlog)
       const updatedBlogs = blogs.concat(response)
-      updatedBlogs.sort((a, b) => (a.likes < b.likes) ? 1 : -1)
+      updatedBlogs.sort((a, b) => (a.likes < b.likes ? 1 : -1))
       setBlogs(updatedBlogs)
-      showNotification(`A new blog ${newBlog.title} by ${newBlog.author} added`, true)
+      showNotification(
+        `A new blog ${newBlog.title} by ${newBlog.author} added`,
+        true
+      )
       setShowCreateBlog(false)
-    } catch(exception) {
-      showNotification(`Failed to add new blog`, false)
+    } catch (exception) {
+      showNotification('Failed to add new blog', false)
     }
   }
 
-  const handleRemove = async id => {
+  const handleRemove = async (id) => {
     try {
-      const response = await blogService.remove(id)
-      const updatedBlogs = blogs.filter(blog => blog.id !== id)
-      updatedBlogs.sort((a, b) => (a.likes < b.likes) ? 1 : -1)
+      await blogService.remove(id)
+      const updatedBlogs = blogs.filter((blog) => blog.id !== id)
+      updatedBlogs.sort((a, b) => (a.likes < b.likes ? 1 : -1))
       setBlogs(updatedBlogs)
-      showNotification(`Successfully removed blog`, true)
-    } catch(exception) {
+      showNotification('Successfully removed blog', true)
+    } catch (exception) {
       console.log(exception)
-      showNotification(`Failed to remove blog`, false)
+      showNotification('Failed to remove blog', false)
     }
   }
 
   const loginForm = () => (
     <div>
-      <Notification notification={notification}/>
+      <Notification notification={notification} />
       <h2>Login</h2>
-    
+
       <form onSubmit={handleLogin}>
         <div>
           username
-            <input
+          <input
             type="text"
             value={username}
             name="Username"
@@ -121,7 +124,7 @@ const App = () => {
         </div>
         <div>
           password
-            <input
+          <input
             type="password"
             value={password}
             name="Password"
@@ -130,32 +133,37 @@ const App = () => {
         </div>
         <button type="submit">login</button>
       </form>
-
     </div>
   )
-  
 
   const content = () => (
     <div>
-      <Notification notification={notification}/>
+      <Notification notification={notification} />
       <h2>blogs</h2>
-      <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
+      <p>
+        {user.name} logged in <button onClick={handleLogout}>logout</button>
+      </p>
       {showCreateBlog ? (
         <div>
-          <NewBlogForm createBlog={handleCreateBlog}/>
+          <NewBlogForm createBlog={handleCreateBlog} />
           <button onClick={() => setShowCreateBlog(false)}>cancel</button>
         </div>
-      )
-        : <button onClick={() => setShowCreateBlog(true)}>create</button>}
-    
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} likeBlog={handleLike} removeBlog={handleRemove}/>
+      ) : (
+        <button onClick={() => setShowCreateBlog(true)}>create</button>
       )}
+
+      {blogs.map((blog) => (
+        <Blog
+          key={blog.id}
+          blog={blog}
+          likeBlog={handleLike}
+          removeBlog={handleRemove}
+        />
+      ))}
     </div>
   )
 
   return user === null ? loginForm() : content()
-  
 }
 
 export default App
