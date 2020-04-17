@@ -1,25 +1,25 @@
 import React, { useState, useEffect } from 'react'
-import Blog from './components/Blog'
+
 import blogService from './services/blogs'
 import loginService from './services/loginService'
+import Blog from './components/Blog'
 import Notification from './components/Notification'
-
+import NewBlogForm from './components/NewBlogForm'
 
 const App = () => {
   const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('') 
   const [password, setPassword] = useState('') 
-  const [title, setTitle] = useState('') 
-  const [author, setAuthor] = useState('') 
-  const [url, setURL] = useState('') 
   const [user, setUser] = useState(null)
   const [notification, setNotification] = useState(null)
+  const [showCreateBlog, setShowCreateBlog] = useState(false)
 
 
   useEffect(() => {
-    blogService.getAll().then(blogs =>
+    blogService.getAll().then(blogs => {
+      blogs.sort((a, b) => (a.likes < b.likes) ? 1 : -1)
       setBlogs( blogs )
-    )  
+    })
   }, [])
 
   useEffect(() => {
@@ -64,16 +64,43 @@ const App = () => {
     setUser(null)
   }
 
-  const handleCreateBlog = async (event) => {
-    event.preventDefault()
-    const newBlog = { title, author, url }
+  const handleLike = async (id, likes) => {
+    try {
+      await blogService.like(id, { likes })
+      const updatedBlogs = blogs.map(blog => blog.id === id ? {...blog, likes} : blog)
+      updatedBlogs.sort((a, b) => (a.likes < b.likes) ? 1 : -1)
+      console.log(updatedBlogs)
+      setBlogs(updatedBlogs)
+      showNotification('Like added succesfully', true)
+    } catch(exception) {
+      console.log(exception)
+      showNotification('Failed to add like', false)
+    }
+  }
+
+  const handleCreateBlog = async newBlog => {
     try {
       const response = await blogService.create(newBlog)
       const updatedBlogs = blogs.concat(response)
+      updatedBlogs.sort((a, b) => (a.likes < b.likes) ? 1 : -1)
       setBlogs(updatedBlogs)
-      showNotification(`A new blog ${title} by ${author} added`, true)
+      showNotification(`A new blog ${newBlog.title} by ${newBlog.author} added`, true)
+      setShowCreateBlog(false)
     } catch(exception) {
       showNotification(`Failed to add new blog`, false)
+    }
+  }
+
+  const handleRemove = async id => {
+    try {
+      const response = await blogService.remove(id)
+      const updatedBlogs = blogs.filter(blog => blog.id !== id)
+      updatedBlogs.sort((a, b) => (a.likes < b.likes) ? 1 : -1)
+      setBlogs(updatedBlogs)
+      showNotification(`Successfully removed blog`, true)
+    } catch(exception) {
+      console.log(exception)
+      showNotification(`Failed to remove blog`, false)
     }
   }
 
@@ -103,6 +130,7 @@ const App = () => {
         </div>
         <button type="submit">login</button>
       </form>
+
     </div>
   )
   
@@ -112,41 +140,16 @@ const App = () => {
       <Notification notification={notification}/>
       <h2>blogs</h2>
       <p>{user.name} logged in <button onClick={handleLogout}>logout</button></p>
-      <h2>create new</h2>
-          
-      <form onSubmit={handleCreateBlog}>
+      {showCreateBlog ? (
         <div>
-          title:
-            <input
-            type="text"
-            value={title}
-            name="Title"
-            onChange={({ target }) => setTitle(target.value)}
-          />
+          <NewBlogForm createBlog={handleCreateBlog}/>
+          <button onClick={() => setShowCreateBlog(false)}>cancel</button>
         </div>
-        <div>
-          author:
-            <input
-            type="text"
-            value={author}
-            name="Author"
-            onChange={({ target }) => setAuthor(target.value)}
-          />
-        </div>
-        <div>
-          url:
-            <input
-            type="text"
-            value={url}
-            name="URL"
-            onChange={({ target }) => setURL(target.value)}
-          />
-        </div>
-        <button type="submit">create</button>
-      </form>
+      )
+        : <button onClick={() => setShowCreateBlog(true)}>create</button>}
     
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} />
+        <Blog key={blog.id} blog={blog} likeBlog={handleLike} removeBlog={handleRemove}/>
       )}
     </div>
   )
