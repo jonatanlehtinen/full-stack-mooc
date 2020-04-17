@@ -24,11 +24,17 @@ const Blog = ({ blog, likeBlog, removeBlog }) => {
   const blogInfo = () => (
     <div>
       {blog.url} <br />
-      {blog.likes}{' '}
-      <button onClick={() => likeBlog(blog.id, blog.likes + 1)}>like</button>
+      {blog.likes}
+      <button
+        onClick={() => likeBlog(blog.id, blog.likes + 1)}
+        id="like-button"
+      >
+        like
+      </button>
       <br />
-      {blog.author} <br />
-      <button onClick={handleRemoveBlog}>remove</button>
+      <button onClick={handleRemoveBlog} id="remove-blog">
+        remove
+      </button>
     </div>
   )
 
@@ -38,9 +44,11 @@ const Blog = ({ blog, likeBlog, removeBlog }) => {
 
   return (
     <div style={blogStyle}>
-      <div>
-        {blog.title}{' '}
-        <button onClick={toggleShowInfo}>{showInfo ? 'hide' : 'view'}</button>
+      <div className="blog-container">
+        {blog.title} {blog.author}
+        <button onClick={toggleShowInfo} id="view-blog">
+          {showInfo ? 'hide' : 'view'}
+        </button>
       </div>
       {showInfo ? blogInfo() : null}
     </div>

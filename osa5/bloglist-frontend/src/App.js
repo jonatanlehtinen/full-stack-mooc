@@ -49,6 +49,7 @@ const App = () => {
       window.localStorage.setItem('loggedBlogUser', JSON.stringify(user))
 
       setUser(user)
+      blogService.setToken(user.token)
       setUsername('')
       setPassword('')
       showNotification(`${user.name} logged in successfully`, true)
@@ -69,7 +70,6 @@ const App = () => {
         blog.id === id ? { ...blog, likes } : blog
       )
       updatedBlogs.sort((a, b) => (a.likes < b.likes ? 1 : -1))
-      console.log(updatedBlogs)
       setBlogs(updatedBlogs)
       showNotification('Like added succesfully', true)
     } catch (exception) {
@@ -118,7 +118,7 @@ const App = () => {
           <input
             type="text"
             value={username}
-            name="Username"
+            id="username"
             onChange={({ target }) => setUsername(target.value)}
           />
         </div>
@@ -127,11 +127,13 @@ const App = () => {
           <input
             type="password"
             value={password}
-            name="Password"
+            id="password"
             onChange={({ target }) => setPassword(target.value)}
           />
         </div>
-        <button type="submit">login</button>
+        <button type="submit" id="login-button">
+          login
+        </button>
       </form>
     </div>
   )
@@ -149,7 +151,12 @@ const App = () => {
           <button onClick={() => setShowCreateBlog(false)}>cancel</button>
         </div>
       ) : (
-        <button onClick={() => setShowCreateBlog(true)}>create</button>
+        <button
+          onClick={() => setShowCreateBlog(true)}
+          id="show-blog-form-button"
+        >
+          create
+        </button>
       )}
 
       {blogs.map((blog) => (
