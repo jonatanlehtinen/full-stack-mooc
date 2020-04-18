@@ -6,12 +6,8 @@ const reducer = (state = initialState, action) => {
   console.log('action', action)
 
   switch(action.type) {
-    case 'SHOW_VOTE_ADDED':
-      const votedText = `You voted '${action.anecdote}'`
-      return votedText
-    case 'SHOW_ANECDOTE_ADDED':
-      const addedText = `You added '${action.anecdote}'`
-      return addedText
+    case 'SET_NOTIFICATION':
+      return action.content
     case 'HIDE_NOTIFICATION':
       return initialState
     default:
@@ -19,23 +15,24 @@ const reducer = (state = initialState, action) => {
   }
 }
 
-export const showVoteAddedNotification = anecdote => {
-  return {
-    type: 'SHOW_VOTE_ADDED',
-    anecdote
+export const setNotification = (content, timeOut) => {
+  return async dispatch => {
+    dispatch(hideNotification(timeOut))
+    dispatch({
+      type: 'SET_NOTIFICATION',
+      content
+    })
   }
 }
 
-export const showAnecdoteAddedNotification = anecdote => {
-  return {
-    type: 'SHOW_ANECDOTE_ADDED',
-    anecdote
-  }
-}
+let currentTimeout = null
 
-export const hideNotification = () => {
-  return {
-    type: "HIDE_NOTIFICATION"
+export const hideNotification = timeOut => {
+  return async dispatch => {
+    clearTimeout(currentTimeout)
+    currentTimeout = setTimeout(() => dispatch({
+      type: 'HIDE_NOTIFICATION',
+    }), timeOut * 1000)
   }
 }
 
